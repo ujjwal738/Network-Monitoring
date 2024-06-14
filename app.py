@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import socket
 import concurrent.futures  # Import for ThreadPoolExecutor
 from scapy.all import srp, Ether, ARP
+import time  # Import time module for adding delays
 
 app = Flask(__name__)
 
@@ -9,7 +10,7 @@ def scan_network(ip_range):
     print("Scanning network for devices...\n")
     devices = []
     try:
-        ans, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range), timeout=5, verbose=False)
+        ans, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range), timeout=10, verbose=False, inter=0.1)  # Add inter parameter for delay between packets
         devices = [(pkt[1].psrc, pkt[1].src) for pkt in ans]
         devices_info = []
 
@@ -59,7 +60,7 @@ def scan_port(ip_address, port):
 
 @app.route('/')
 def index():
-    return render_template('index1.html')
+    return render_template('index.html')
 
 
 @app.route('/scan', methods=['POST'])
